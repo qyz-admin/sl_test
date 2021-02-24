@@ -108,4 +108,4 @@ if __name__ == '__main__':
     opt = option()  # 建立设置信息
     this_GUI()  # 运行GUI界面
     print('处理耗时：')
-
+    this_GUI()  # 运行GUI界面
