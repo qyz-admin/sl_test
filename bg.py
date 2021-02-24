@@ -107,5 +107,5 @@ if __name__ == '__main__':
     # 先打开需要汇总的工作表，然后才能运行
     opt = option()  # 建立设置信息
     this_GUI()  # 运行GUI界面
-
+    print('处理耗时：')
 
