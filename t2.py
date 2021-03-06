@@ -2,7 +2,10 @@ import pandas as pd
 import datetime
 import re
 import numpy as np
+
 filePath = r'D:\Users\Administrator\Desktop\2020.08.05 神龙泰国签收表.xlsx'
+
+
 # df = pd.DataFrame({'key1':['ab','bb','cb','db'],'key2':[None,'f', None,'h'],'key3':[1.0,"2",3,4]},index=['k','l','m','n',])
 # df2 = pd.DataFrame({'key1':['a','B','c','d'],'key2':['e','f','g','H'],'key4':['i','j','K','L']},index = ['p','q','u','v'])
 # df = pd.read_excel(filePath)
@@ -13,6 +16,8 @@ def getWaybillStatus(df):
             return '空白'
         else:
             return df['物流状态']
+
+
 df = pd.read_excel(filePath)
 print(df)
 df.drop(df[(df.运单编号.isna()) & (df.是否改派 == '改派')].index, inplace=True)

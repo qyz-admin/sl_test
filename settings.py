@@ -4,13 +4,20 @@ class Settings():
         self.mysql1 = {'host': 'localhost',      #数据库地址
                       'user': 'root',           #数据库账户
                       'port': '3306',
-                      'password': '123456',     #数据库密码
+                      'password': '123456',     #数据库密码   654321
                       'datebase': 'logistics_status',   #数据库名称
                       'charset': 'utf8'         #数据库编码
                        }
-        self.mysql2 = {'host': 'tidb.giikin.com',  # 数据库地址
+        self.mysql20 = {'host': 'tidb.giikin.com',  # 数据库地址
                        'user': 'shenlongkf',  # 数据库账户
                        'port': '4000',
+                       'password': 'SIK87&67asd',  # 数据库密码
+                       'datebase': 'gdqs_shenlong',  # 数据库名称
+                       'charset': 'utf8'  # 数据库编码
+                       }
+        self.mysql2 = {'host': 'tidb2.giikin.com',  # 数据库地址
+                       'user': 'shenlong_kf',  # 数据库账户
+                       'port': '39999',
                        'password': 'SIK87&67asd',  # 数据库密码
                        'datebase': 'gdqs_shenlong',  # 数据库名称
                        'charset': 'utf8'  # 数据库编码
@@ -33,6 +40,7 @@ class Settings():
             '后台': {'username': 'louweibin@giikin.com',
                    'password': 'wo.1683485'}}
         self.email = {'smtp': 'smtp.163.com',
-                      'email': 'qyz1404039293@163.com',
+                      'email': 'qyz1404039293@163.com',      # 密码： qyz04163510
                       'password': 'VTOYQJKMQOCSFSGE'}
         #  https://blog.csdn.net/weixin_36931308/article/details/103767758 （危机处理需要）
+        #  LECOGDYYBJUJJBST

@@ -4,6 +4,7 @@ import datetime
 import xlwings
 import pandas as pd
 from wlMysql import WlMysql
+from mysqlControl import MysqlControl
 
 class WlExecl():
     # 物流excel的导入和整理
@@ -30,8 +31,14 @@ class WlExecl():
                         gk = os.path.basename(filePath)  # 获取文件名
                         if gk[:6] == 'Giikin':   # 需单独添加日期时间
                             st = re.search(r'\d+', filePath).group() # 获取文件名中的日期
+                            # print(st[len(st)-4:-2])  # 获取文件名中的具体日期
+                            # print(st[len(st) - 2:])
                             tm = datetime.datetime.strptime('2020-' + st[len(st)-4:-2] + '-' + st[len(st) - 2:], '%Y-%m-%d')
-                            tm = (tm - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+                            # tm = (tm - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+                            tm = tm.strftime('%Y-%m-%d')
+                            # print(tm)
+                            # print(sht.used_range.last_cell.row)
+                            # print(sht.used_range.last_cell.column)
                             File.insert(sht.used_range.last_cell.column, '出货时间', tm)
                             print(File)
                             wb = self.isRightShet(File, team, sht.name)
@@ -56,12 +63,12 @@ class WlExecl():
         app.quit()
     def isRightShet(self,File,team,shtname):
         # print(File)
-        math = {'slxmt': {'出货时间': [True, ['出货时间', '发货日', 'Outbound Time'], []],
-                            '运单编号': [True, ['渠道转单号', '系统运单号', 'LM Tracking', '运单号'], []],
-                         '订单编号': [False, ['订单编号','原单号', '顾客管理号码'], []],
-                         '物流状态': [False, ['物流状态', '状态', '状况'], []],
-                         '状态时间': [False, ['轨迹日期', '状态时间', '末条信息日期时间', '出货预定日'], []]},
-
+        math = {'slxmt': {'出货时间': [True, ['Outbound Time', '出货时间'], []],
+                            '运单编号': [True, ['LM Tracking', '运单号'], []],
+                         '订单编号': [False, [], []],
+                         '物流状态': [False, [], []],
+                         '状态时间': [False, [], []]},
+                        '上线时间': [False, [], []],
                 'sltg': {'出货时间': [True, ['提货日期', '发货日期', '接收订单资料日期', '出货时间'], []],
                            '运单编号': [True, ['运单号', '新运单号', '转单号', '跟踪单号'], []],
                          '订单编号': [False, ['订单号', '新订单号'], []],
@@ -134,6 +141,114 @@ class WlExecl():
         else:
             return None
 
+    # 全部订单查询详情使用
+    def queryExecl(self,filePath, team):
+        fileType = os.path.splitext(filePath)[1]
+        print(fileType)
+        app = xlwings.App(visible=False, add_book=False)
+        app.display_alerts = False
+
+        if 'xls' in fileType:
+            wb = app.books.open(filePath, update_links=False, read_only=True)
+            for sht in wb.sheets:
+                try:
+                    db = None
+                    file = sht.used_range.options(pd.DataFrame, header=1,
+                                                  numbers=int, index=False).value
+                    if file.empty or sht.name == '宅配':
+                        lst = sht.used_range.value
+                        file = pd.DataFrame(lst[1:], columns=lst[0])
+                except Exception as e:
+                    print('xxxx查看失败：' + sht.name, str(Exception) + str(e))
+                print('++++正在导入：' + sht.name + ' 共：' + str(len(db)) + '行', 'sheet共：' + str(
+                    sht.used_range.last_cell.row) + '行')
+                # 将返回的dateFrame导入数据库的临时表
+                self.sql.writeSqlReplace(db)
+                print('++++正在更新：' + sht.name + '--->>>到总订单')
+                # 将数据库的临时表替换进指定的总表
+                self.sql.replaceInto(team, list(db.columns))
+                print('++++----->>>' + sht.name + '：订单更新完成++++')
+    def qianshoubiao(self, filePath, team):
+        fileType = os.path.splitext(filePath)[1]
+        app = xlwings.App(visible=False, add_book=False)
+        # 不显示excel窗口
+        app.display_alerts = False
+
+        if 'xls' in fileType:
+            wb = app.books.open(filePath, update_links=False, read_only=True)
+            # 遍历每个sheet
+            for sht in wb.sheets:
+                if '问题件' not in sht.name and '录单' not in sht.name and \
+                        '历史' not in sht.name and '取件' not in sht.name and \
+                        '异常' not in sht.name and sht.api.visible == -1:
+                    try:
+                        db = None
+                        file = sht.used_range.options(pd.DataFrame, header=1,
+                                                      numbers=int, index=False).value
+                        # 如果xlwings的直接转换失败的话。读取单元格值，并转换为db.DateFrame格式
+                        if file.empty or sht.name == '宅配':
+                            lst = sht.used_range.value
+                            file = pd.DataFrame(lst[1:], columns=lst[0])
+                        db = file
+                    except Exception as e:
+                        print('xxxx查看失败：' + sht.name, str(Exception) + str(e))
+                    if db is not None and len(db) > 0:
+                        print('++++正在导入：' + sht.name + ' 共：' + str(len(db)) + '行', 'sheet共：' + str(
+                            sht.used_range.last_cell.row) + '行')
+                        # 将返回的dateFrame导入数据库的临时表
+                        self.sql.SqlWl(db)
+                        print('++++正在更新：' + sht.name + '--->>>到总订单')
+                        # 将数据库的临时表替换进指定的总表
+                        # self.sql.replaceInto(team, list(db.columns))
+                        # print('++++----->>>' + sht.name + '：订单更新完成++++')
+                    else:
+                        print('----------不用导入(五项条件不足)：' + sht.name)
+                else:
+                    print('----不用导入：' + sht.name)
+            # 关闭excel文件
+            wb.close()
+            # 退出excel app
+            app.quit()
+    def wuliubiao(self, filePath, team):
+        fileType = os.path.splitext(filePath)[1]
+        app = xlwings.App(visible=False, add_book=False)
+        # 不显示excel窗口
+        app.display_alerts = False
+        if 'xls' in fileType:
+            wb = app.books.open(filePath, update_links=False, read_only=True)
+            # 遍历每个sheet
+            for sht in wb.sheets:
+                if '问题件' not in sht.name and '录单' not in sht.name and \
+                        '历史' not in sht.name and '取件' not in sht.name and \
+                        '异常' not in sht.name and sht.api.visible == -1:
+                    try:
+                        db = None
+                        file = sht.used_range.options(pd.DataFrame, header=1,
+                                                      numbers=int, index=False).value
+                        # 如果xlwings的直接转换失败的话。读取单元格值，并转换为db.DateFrame格式
+                        if file.empty or sht.name == '宅配':
+                            lst = sht.used_range.value
+                            file = pd.DataFrame(lst[1:], columns=lst[0])
+                        db = file
+                        print(db)
+                    except Exception as e:
+                        print('xxxx查看失败：' + sht.name, str(Exception) + str(e))
+                else:
+                    print('----不用导入：' + sht.name)
+            # 关闭excel文件
+            wb.close()
+        # 退出excel app
+        app.quit()
+if __name__ == '__main__':
+    # 无运单号查询---泰国 （下午四点开始运行）
+    m = MysqlControl()
+    for team in ['sltg']:
+        m.noWaybillNumber(team)
+
+    # # 产品花费表200
+    # match = {'JP': '日本'}
+    # for team in match.keys():
+    #     m.orderCost(team)
 
 
 
