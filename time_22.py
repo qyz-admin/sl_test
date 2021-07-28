@@ -1,24 +1,27 @@
 import time
 import datetime
 import sys
-month_last = (datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m') + '-01'
-month_yesterday = datetime.datetime.now().strftime('%Y-%m-%d')
-month_begin = '2020-11-01'
 
-print(month_last)
+print (datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
 
-print(month_yesterday)
 
-print(month_begin)
 
-print("55")
-
+Time_day = []
+for i in range(1, datetime.datetime.now().month +1):  # 获取当年当前的月份时间
+	try:
+		daytime = (datetime.datetime.now().replace(month=i)).strftime('%Y-%m') + ((datetime.datetime.now()).strftime('-%d'))
+		print(daytime)
+		Time_day.append(daytime)
+	except Exception as e:
+		Time_day.append(daytime)
+		print('xxxx时间配置出错,已手动调整：' + str(i) + '月份', str(Exception) + str(e))
+		Time_day.append(str(int(datetime.datetime.now().year)) + '-' + str(i) + (datetime.datetime.now().strftime('-%d')))
+for i in range(datetime.datetime.now().month + 1, 13):  # 获取往年当前的月份时间
+	try:
+		daytime = str(int(datetime.datetime.now().year) - 1) + (datetime.datetime.now().replace(month=i)).strftime('-%m') + (
+                              (datetime.datetime.now()).strftime('-%d'))
+		Time_day.append(daytime)
+	except Exception as e:
+		print('xxxx时间配置出错失败00：' + str(i) + '月份', str(Exception) + str(e))
+		Time_day.append(str(int(datetime.datetime.now().year) - 1) + '-' + str(i) + (datetime.datetime.now().strftime('-%d')))
 print(datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1))
-
-
-import datetime
-from dateutil.relativedelta import relativedelta
- 
-
-month_ago = (datetime.datetime.now() - relativedelta(months=2)).strftime('%Y-%m-%d')
-print(month_ago)

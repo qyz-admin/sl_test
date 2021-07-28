@@ -36,3 +36,12 @@ for j in Time_day:
 print(1109) 
 print(Time_day[11])
 print(Time_day[10])
+
+
+
+
+for tem in ('"神龙家族-港澳台"|slgat', '"红杉家族-港澳台", "红杉家族-港澳台2"|slgat_hs', '"火凤凰-港澳台"|slgat_hfh'):
+    tem1 = tem.split('|')[0]
+    tem2 = tem.split('|')[1]
+    print(tem1)
+    print(tem2)
