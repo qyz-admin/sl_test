@@ -6,6 +6,10 @@ from wlMysql import WlMysql
 from wlExecl import WlExecl
 import datetime
 
+month_last = (datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m') + '-01'
+month_now = datetime.datetime.now().strftime('%Y-%m-%d')
+print(month_last)
+print(month_now)
 url="https://pro.jd.com/mall/active/4BNKTNkRMHJ48QQ5LrUf6AsydtZ6/index.html"
 try:
     r = requests.get(url)

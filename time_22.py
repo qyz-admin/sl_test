@@ -4,7 +4,11 @@ import sys
 
 print (datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
 
+now_month = '2021.09.26'
+# begin = datetime.date(now_month)
+print (now_month.replace('.','-'))
 
+print (99089)
 
 Time_day = []
 for i in range(1, datetime.datetime.now().month +1):  # 获取当年当前的月份时间
@@ -24,4 +28,7 @@ for i in range(datetime.datetime.now().month + 1, 13):  # 获取往年当前的�
 	except Exception as e:
 		print('xxxx时间配置出错失败00：' + str(i) + '月份', str(Exception) + str(e))
 		Time_day.append(str(int(datetime.datetime.now().year) - 1) + '-' + str(i) + (datetime.datetime.now().strftime('-%d')))
+
+print(99)
+print(datetime.datetime.now().strftime('%Y-%m-%d'))
 print(datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1))
